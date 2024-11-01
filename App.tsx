@@ -1,118 +1,120 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
-import React from 'react';
-import type {PropsWithChildren} from 'react';
 import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+  NavigationContainer,
+  StackActions,
+  useNavigation,
+} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import React, {useCallback} from 'react';
+import {Button, Text, View} from 'react-native';
+import ReactNativeModal from 'react-native-modal';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+function HomeScreen() {
+  const navigation = useNavigation();
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
-
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
   return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
+    <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+      <Text>Home Screen</Text>
+
+      <Button
+        title="Go to second screen"
+        onPress={() => navigation.navigate('SecondScreen')}
+      />
     </View>
   );
 }
 
-function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+function SecondScreen() {
+  const navigation = useNavigation();
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
+  const [isVisible, setIsVisible] = React.useState(false);
+
+  const hideModalAndNavigateBack = useCallback(() => {
+    setIsVisible(false);
+    navigation.goBack();
+  }, [navigation]);
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
+    <View
+      style={{
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'cyan',
+      }}>
+      <Text>Second Screen</Text>
+
+      <Button title="Open modal" onPress={() => setIsVisible(true)} />
+      <Button
+        title="Go to modal screen"
+        onPress={() => navigation.navigate('ModalScreen')}
       />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+      {/* <Button title="Open modal" onPress={hideModalAndNavigateBack} /> */}
+
+      <ReactNativeModal
+        isVisible={isVisible}
+        animationIn="slideInUp"
+        animationInTiming={300}
+        animationOut="slideOutDown"
+        animationOutTiming={300}
+        style={{
+          flex: 1,
+          margin: 0,
+          padding: 0,
+          marginTop: 500,
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: 'red',
+        }}>
+        <Button
+          title="Close and navigate back"
+          onPress={hideModalAndNavigateBack}
+        />
+      </ReactNativeModal>
+    </View>
   );
 }
 
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
+function ModalScreen() {
+  const navigation = useNavigation();
+
+  const navigateBack = useCallback(() => {
+    navigation.dispatch(StackActions.pop(2));
+  }, [navigation]);
+
+  return (
+    <View
+      style={{
+        flex: 1,
+        margin: 0,
+        padding: 0,
+        marginTop: 500,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'red',
+      }}>
+      <Text>Modal Screen</Text>
+
+      <Button title="Close and navigate back" onPress={navigateBack} />
+    </View>
+  );
+}
+
+const Stack = createNativeStackNavigator();
+
+function App(): React.JSX.Element {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="SecondScreen" component={SecondScreen} />
+        <Stack.Screen
+          name="ModalScreen"
+          component={ModalScreen}
+          options={{presentation: 'transparentModal', headerShown: false}}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
 
 export default App;
