@@ -5,7 +5,7 @@ import {
 } from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React, {useCallback} from 'react';
-import {Button, Text, View} from 'react-native';
+import {Button, Text, TextInput, View} from 'react-native';
 import ReactNativeModal from 'react-native-modal';
 
 function HomeScreen() {
@@ -14,6 +14,8 @@ function HomeScreen() {
   return (
     <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
       <Text>Home Screen</Text>
+
+      <TextInput placeholder="Enter text" />
 
       <Button
         title="Go to second screen"
